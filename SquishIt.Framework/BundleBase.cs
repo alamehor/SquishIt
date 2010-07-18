@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Web;
 using SquishIt.Framework.FileResolvers;
@@ -81,12 +82,8 @@ namespace SquishIt.Framework
 
         protected string ResolveAppRelativePathToFileSystem(string file)
         {
-            if (HttpContext.Current == null)
-            {
-                file = file.Replace("/", "\\").TrimStart('~').TrimStart('\\');
-                return @"C:\" + file.Replace("/", "\\");
-            }            
-            return HttpContext.Current.Server.MapPath(file);
+            var fileResolverCollection = new FileResolverCollection();
+            return fileResolverCollection.Resolve(file, AppRelativePathResolver.Type).FirstOrDefault();
         }
 
         protected string ExpandAppRelativePath(string file)
@@ -112,6 +109,26 @@ namespace SquishIt.Framework
         protected bool FileExists(string file)
         {
             return fileReaderFactory.FileExists(file);
+        }
+        
+        protected string FindAnExistingPackagedBundle(string file)
+        {
+            string packagedFile = string.Empty;
+            string expandedRelativePathToFile = ExpandAppRelativePath(file);
+
+            try
+            {
+                if(((IPackagedFileReaderFactory)fileReaderFactory).PackagedFileNameExists(expandedRelativePathToFile))
+                {
+                    packagedFile = ((IPackagedFileReaderFactory)fileReaderFactory).PackagedFileName(expandedRelativePathToFile);
+                }
+            }
+            catch (Exception)
+            {
+                packagedFile = string.Empty;
+            }
+            
+            return packagedFile;
         }
     }
 }

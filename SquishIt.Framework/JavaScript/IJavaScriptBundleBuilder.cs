@@ -12,5 +12,6 @@ namespace SquishIt.Framework.JavaScript
         void AsNamed(string name, string renderTo);
         IJavaScriptBundleBuilder ForceDebug();
         IJavaScriptBundleBuilder ForceRelease();
+        IJavaScriptBundleBuilder AsPackageable();
     }
 }

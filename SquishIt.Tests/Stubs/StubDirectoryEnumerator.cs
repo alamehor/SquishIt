@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using SquishIt.Framework.Directories;
 
@@ -7,11 +8,26 @@ namespace SquishIt.Tests.Stubs
     {
         public IEnumerable<string> GetFiles(string path)
         {
-            yield return path + "file1.js";
-            yield return path + "file2.js";
-            yield return path + "file3.js";
-            yield return path + "file4.js";
-            yield return path + "file5.js";
+            yield return @"C:\test\file1.js";
+            yield return @"C:\test\file2.js";
+            yield return @"C:\test\file3.js";
+            yield return @"C:\test\file4.js";
+            yield return @"C:\test\file5.js";
+        }
+
+        public IEnumerable<string> GetFiles(string path, string orderingFileName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<string> GetFiles(string path, string[] filenamePatterns)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<string> GetFiles(string path, string[] filenamePatterns, string[] fileNameExclusions)
+        {
+            throw new NotImplementedException();
         }
     }
 }

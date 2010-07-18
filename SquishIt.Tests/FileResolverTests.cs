@@ -18,7 +18,9 @@ namespace SquishIt.Tests
             var values = new Dictionary<string, string>()
                              {
                                  {@"C:\testfile.js", @"C:\testfile.js"},
+                                 {@"C:\testfile.css", @"C:\testfile.css"},
                                  {@"C:\test\testfile.js", @"C:\test\testfile.js"},
+                                 {@"C:\test\testfile.css", @"C:\test\testfile.css"},
                                  {@"D:\testfile.js", @"D:\testfile.js"},
                                  {@"\testfile.js", @"C:\testfile.js"},
                                  {@"\test\testfile.js", @"C:\test\testfile.js"},
@@ -41,7 +43,7 @@ namespace SquishIt.Tests
         {
             var directoryEnumerator = new StubDirectoryEnumerator();
             var fileResolver = new DirectoryResolver(directoryEnumerator);
-            var files = fileResolver.TryResolve(@"C:\test\").ToList();
+            var files = fileResolver.TryResolve(@"C:\test\*.js").ToList();
 
             Assert.AreEqual(@"C:\test\file1.js", files[0]);
             Assert.AreEqual(@"C:\test\file2.js", files[1]);

@@ -3,7 +3,7 @@ using SquishIt.Framework.Directories;
 
 namespace SquishIt.Framework.FileResolvers
 {
-    public class DirectoryResolver: IFileResolver
+    public class DirectoryResolver: IFileResolver, IDirectoryResolver
     {
         public static string Type
         {
@@ -26,5 +26,23 @@ namespace SquishIt.Framework.FileResolvers
         {
             return directoryEnumerator.GetFiles(directory);            
         }        
+        
+        public IEnumerable<string> TryResolve(string directory,string[] filenamePatterns)
+        {
+            return directoryEnumerator.GetFiles(directory, filenamePatterns);            
+        }        
+        
+        public IEnumerable<string> TryResolve(string directory,string[] filenamePatterns, string[] fileNameExclusions)
+        {
+            return directoryEnumerator.GetFiles(directory, filenamePatterns, fileNameExclusions);            
+        }        
+    }
+
+    public interface IDirectoryResolver 
+    {
+        IEnumerable<string> TryResolve(string directory,string[] filenamePatterns);
+        IEnumerable<string> TryResolve(string directory,string[] filenamePatterns, string[] fileNameExclusions);
+
+
     }
 }

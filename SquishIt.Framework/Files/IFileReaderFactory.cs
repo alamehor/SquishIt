@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace SquishIt.Framework.Files
 {
     public interface IFileReaderFactory

@@ -20,26 +20,57 @@ namespace SquishIt.Framework.Directories
         }
 
         public IEnumerable<string> GetFiles(string path)
-        {            
-            var files = directory.GetFiles(path, "*.js").ToArray();
-            var vsDocFiles = directory.GetFiles(path, "*-vsdoc.js").ToArray();
-            files = files.Except(vsDocFiles).ToArray();
+        { 
+            var dir = Path.GetDirectoryName(path);
+            var filenamePattern = Path.GetFileName(path);
+            var files = directory.GetFiles(dir, filenamePattern).ToArray();
+            return files;
+        }
+
+        public IEnumerable<string> GetFiles(string path, string orderingFileName)
+        {
+            var files = GetFiles(path);
             var ordering = GetOrdering(path);
 
-            if (ordering.Count <= 0)
+            if (ordering.Count() <= 0)
             {
                 return files;
             }
 
-            if (ordering.Count != files.Length)
+            if (ordering.Count() != files.Count())
             {
                 Console.Error.WriteLine("Number of entries in 'ordering.txt' does not match number of javascript files in folder.");
             }
 
-            return OrderFiles(ordering, files);
+            return OrderFiles(ordering, files.ToList());
+
         }
 
-        private IEnumerable<string> OrderFiles(List<string> ordering, string[] files)
+        public IEnumerable<string> GetFiles(string path, string[] filenamePatterns)
+        {
+            IEnumerable<string> files = new string[0];
+            foreach(string pattern in filenamePatterns)
+            {
+                files = files.Union(directory.GetFiles(path, pattern));
+            }
+            return files;
+        }
+
+        public IEnumerable<string> GetFiles(string path, string[] filenamePatterns, string[] fileNameExclusions)
+        {
+            IEnumerable<string> files = new string[0];
+            foreach(string pattern in filenamePatterns)
+            {
+                files = files.Union(directory.GetFiles(path, pattern));
+            }
+            foreach(string exclusion in fileNameExclusions)
+            {
+                files = files.Except(directory.GetFiles(path, exclusion));
+            }
+            return files;
+        }
+
+        private IEnumerable<string> OrderFiles(IEnumerable<string> ordering, IEnumerable<string> files)
         {
             var result = new List<string>();
             foreach (string order in ordering)
@@ -55,7 +86,7 @@ namespace SquishIt.Framework.Directories
             return result;
         }
 
-        private List<string> GetOrdering(string path)
+        private IEnumerable<string> GetOrdering(string path)
         {
             var ordering = new List<string>();
             string orderingFile = path + "ordering.txt";
@@ -63,10 +94,12 @@ namespace SquishIt.Framework.Directories
             {
                 using (var sr = new StreamReader(orderingFile))
                 {
-                    ordering.Add(sr.ReadLine().ToLower());
+                    while(!sr.EndOfStream)
+                    {
+                        yield return sr.ReadLine();
+                    }
                 }
             }
-            return ordering;
         }
     }
 }

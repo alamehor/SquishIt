@@ -4,9 +4,12 @@ namespace SquishIt.Framework.Directories
 {
     public class Directory: IDirectory
     {
-        public IEnumerable<string> GetFiles(string path, string js)
+        public IEnumerable<string> GetFiles(string path, string filePattern)
         {
-            return System.IO.Directory.GetFiles(path, js);
+            if(string.IsNullOrEmpty(filePattern))
+                return System.IO.Directory.GetFiles(path);
+            else
+                return System.IO.Directory.GetFiles(path, filePattern);
         }
     }
 }

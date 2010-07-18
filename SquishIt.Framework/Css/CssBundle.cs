@@ -17,6 +17,7 @@ namespace SquishIt.Framework.Css
         private string mediaTag = "";
         private CssCompressors cssCompressor = CssCompressors.YuiCompressor;
         private bool renderOnlyIfOutputFileMissing = false;
+        private bool isPackageable = false;
         private bool processImports = false;
         private const string CssTemplate = "<link rel=\"stylesheet\" type=\"text/css\" {0} href=\"{1}\" />";
         //Added to support @import
@@ -85,6 +86,12 @@ namespace SquishIt.Framework.Css
             debugStatusReader.ForceRelease();
             return this;
         }
+        
+        public ICssBundleBuilder AsPackageable()
+        {
+            isPackageable = true;
+            return this;
+        }
 
         string ICssBundle.RenderNamed(string name)
         {
@@ -116,51 +123,67 @@ namespace SquishIt.Framework.Css
                 {
                     if (!renderedCssFiles.ContainsKey(key))
                     {
-                        string compressedCss;
-                        string hash= null;
-                        bool hashInFileName = false;
-
-                        string outputFile = ResolveAppRelativePathToFileSystem(renderTo);
-
-                        if (renderTo.Contains("#"))
-                        {
-                            hashInFileName = true;
-                            compressedCss = CompressCss(outputFile, GetFilePaths(cssFiles), MapCompressorToIdentifier(cssCompressor));
-                            hash = Hasher.Create(compressedCss);
-                            renderTo = renderTo.Replace("#", hash);
-                            outputFile = outputFile.Replace("#", hash);
-                        }
-
-                        if (renderOnlyIfOutputFileMissing && FileExists(outputFile))
-                        {
-                            compressedCss = ReadFile(outputFile);
-                        }
-                        else
-                        {
-                            compressedCss = CompressCss(outputFile, GetFilePaths(cssFiles), MapCompressorToIdentifier(cssCompressor));
-                            WriteCssToFiles(compressedCss, outputFile, null);
-                        }
-                        
-                        if (hash == null)
-                        {
-                            hash = Hasher.Create(compressedCss);
-                        }
-
                         string renderedCssTag;
-                        if (hashInFileName)
+                        string packagedFile = string.Empty;
+                        if (Bundle.PackageCss)
                         {
-                            renderedCssTag = String.Format(CssTemplate, mediaTag, ExpandAppRelativePath(renderTo));
+                            packagedFile = FindAnExistingPackagedBundle(renderTo);
+                        }
+
+                        if (!string.IsNullOrEmpty(packagedFile))
+                        {
+                            renderedCssTag = String.Format(CssTemplate, mediaTag, packagedFile);
                         }
                         else
                         {
-                            string path = ExpandAppRelativePath(renderTo);
-                            if (path.Contains("?"))
+
+                            string compressedCss;
+                            string hash = null;
+                            bool hashInFileName = false;
+
+                            string outputFile = ResolveAppRelativePathToFileSystem(renderTo);
+
+                            if (renderTo.Contains("#"))
                             {
-                                renderedCssTag = String.Format(CssTemplate, mediaTag, path + "&r=" + hash);
+                                hashInFileName = true;
+                                compressedCss = CompressCss(outputFile, GetFilePaths(cssFiles),
+                                                            MapCompressorToIdentifier(cssCompressor));
+                                hash = Hasher.Create(compressedCss);
+                                renderTo = renderTo.Replace("#", hash);
+                                outputFile = outputFile.Replace("#", hash);
+                            }
+
+                            if (renderOnlyIfOutputFileMissing && FileExists(outputFile))
+                            {
+                                compressedCss = ReadFile(outputFile);
                             }
                             else
                             {
-                                renderedCssTag = String.Format(CssTemplate, mediaTag, path + "?r=" + hash);
+                                compressedCss = CompressCss(outputFile, GetFilePaths(cssFiles),
+                                                            MapCompressorToIdentifier(cssCompressor));
+                                WriteCssToFiles(compressedCss, outputFile, null);
+                            }
+
+                            if (hash == null)
+                            {
+                                hash = Hasher.Create(compressedCss);
+                            }
+
+                            if (hashInFileName)
+                            {
+                                renderedCssTag = String.Format(CssTemplate, mediaTag, ExpandAppRelativePath(renderTo));
+                            }
+                            else
+                            {
+                                string path = ExpandAppRelativePath(renderTo);
+                                if (path.Contains("?"))
+                                {
+                                    renderedCssTag = String.Format(CssTemplate, mediaTag, path + "&r=" + hash);
+                                }
+                                else
+                                {
+                                    renderedCssTag = String.Format(CssTemplate, mediaTag, path + "?r=" + hash);
+                                }
                             }
                         }
                         renderedCssFiles.Add(key, renderedCssTag);
