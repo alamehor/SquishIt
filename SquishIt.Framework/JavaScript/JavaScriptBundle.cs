@@ -131,7 +131,7 @@ namespace SquishIt.Framework.JavaScript
 
 
             if (!renderedJavaScriptFiles.ContainsKey(key))
-            {
+            {  
                 lock (renderedJavaScriptFiles)
                 {
                     if (!renderedJavaScriptFiles.ContainsKey(key))

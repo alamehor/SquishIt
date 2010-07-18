@@ -12,8 +12,7 @@ namespace SquishIt.Framework.Files
 
         public string PackagedFileName(string file)
         {
-            string foundFile = get_the_best_match_for_the_packaged_file_name(file.Replace("#", "*"));
-            return convert_back_to_original_path_format(foundFile, file);
+            return get_the_best_match_for_the_packaged_file_name(file.Replace("#", "*"));
         }
 
 
@@ -40,7 +39,7 @@ namespace SquishIt.Framework.Files
 
         string convert_back_to_original_path_format(string foundFile, string file)
         {
-            string originalDir = Path.GetDirectoryName(file);
+            string originalDir = Path.GetDirectoryName(file);  
             string foundFileName = Path.GetFileName(foundFile);
             return Path.Combine(originalDir, foundFileName).Replace("\\", "/");
         }

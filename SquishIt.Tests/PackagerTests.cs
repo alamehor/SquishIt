@@ -47,6 +47,13 @@ namespace SquishIt.Framework.Tests
             jsMockFileReaderFactory.SetContents(javaScript);            
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            Bundle.PackageJavaScript = false;
+            Bundle.PackageCss = false;
+        }
+
         [Test]
         public void CanConfigureBundlerToUsePackagedCss()
         {

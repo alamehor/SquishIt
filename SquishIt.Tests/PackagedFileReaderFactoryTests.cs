@@ -73,7 +73,7 @@ namespace SquishIt.Tests
 
             PackagerTests.write_a_test_file_to_the_file_system(testFile);
 
-            Assert.AreEqual(testFile,factory.PackagedFileName(testFile));
+            Assert.AreEqual(testFile.Replace("/", @"\"),factory.PackagedFileName(testFile));
         }
 
         [Test]
@@ -86,7 +86,7 @@ namespace SquishIt.Tests
 
             PackagerTests.write_a_test_file_to_the_file_system(testFile);
 
-            Assert.AreEqual(testFile,factory.PackagedFileName(packageFileName));
+            Assert.AreEqual(testFile.Replace("/", @"\"),factory.PackagedFileName(packageFileName));
         }
 
         [Test]
@@ -101,6 +101,8 @@ namespace SquishIt.Tests
             PackagerTests.write_a_test_file_to_the_file_system(testFile1);
             PackagerTests.write_a_test_file_to_the_file_system(testFile2);
             var found = factory.PackagedFileName(packageFileName);
+            testFile1 = testFile1.Replace("/", @"\");
+            testFile2 = testFile2.Replace("/", @"\");
             Assert.That(found == testFile1 || found == testFile2);
             
         }
@@ -122,7 +124,7 @@ namespace SquishIt.Tests
             Thread.Sleep(1001);
             PackagerTests.write_a_test_file_to_the_file_system(testFile3);
 
-            Assert.AreEqual(testFile1, factory.PackagedFileName(packageFileName));
+            Assert.AreEqual(testFile1.Replace("/", @"\"), factory.PackagedFileName(packageFileName));
             
         }
 

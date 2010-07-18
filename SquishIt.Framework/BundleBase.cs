@@ -109,12 +109,12 @@ namespace SquishIt.Framework
         protected bool FileExists(string file)
         {
             return fileReaderFactory.FileExists(file);
-        }
+        }   
         
         protected string FindAnExistingPackagedBundle(string file)
         {
             string packagedFile = string.Empty;
-            string expandedRelativePathToFile = ExpandAppRelativePath(file);
+            string expandedRelativePathToFile = ResolveAppRelativePathToFileSystem(ExpandAppRelativePath(file));
 
             try
             {
@@ -123,12 +123,20 @@ namespace SquishIt.Framework
                     packagedFile = ((IPackagedFileReaderFactory)fileReaderFactory).PackagedFileName(expandedRelativePathToFile);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 packagedFile = string.Empty;
             }
             
-            return packagedFile;
+            return convert_back_to_original_path_format(packagedFile,file);
+        }
+
+        string convert_back_to_original_path_format(string foundFile, string file)
+        {
+            string originalDir = Path.GetDirectoryName(file.Replace("~/","/"));  
+
+            string foundFileName = Path.GetFileName(foundFile);
+            return Path.Combine(originalDir, foundFileName).Replace("\\", "/");
         }
     }
 }

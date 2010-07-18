@@ -65,6 +65,12 @@ namespace SquishIt.Framework.Tests
 
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            Bundle.PackageJavaScript = false;
+            Bundle.PackageCss = false;
+        }
 
         [Test]
         public void ShouldRenderTheExistingPackagedJavaScriptBundleInsteadOfCreatingANewOne()
